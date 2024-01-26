@@ -6,6 +6,11 @@ const rentalSchema = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: 'peoples',
     required: true
+  },  
+  owner: {
+    type: mongoose.Types.ObjectId,
+    ref: 'peoples',
+    required: true
   },
   HouseData: {
     type: mongoose.Types.ObjectId,
@@ -24,6 +29,7 @@ const rentalSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+
   status: {
     type: String,
     enum: ['Confirmed', 'Pending', 'Cancelled'],

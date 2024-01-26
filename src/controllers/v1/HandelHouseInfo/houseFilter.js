@@ -24,7 +24,14 @@ const houseFilter = async (req,res,next)=>{
   }  
    if(req.query.BathRoom){
      query.bathrooms =  req.query.BathRoom;
+   }   
+   if(req.query.name){
+     query.name =  new RegExp(req.query.name,'i');
+   }   
+   if(req.query.city){
+     query.city =  req.query.city;
    }
+   
   const totalData = await houses.countDocuments(query);
   const result = await  houses.find(query).sort(sortop).skip((page-1) * limit).limit(limit);
   res.json({totalData:totalData , houses : result});

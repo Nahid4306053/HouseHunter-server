@@ -6,6 +6,11 @@ const PaymnetHistoryModel = new Schema({
      type: mongoose.Types.ObjectId ,
      required: true,
      ref: 'peoples'              
+     },       
+     owner:{
+     type: mongoose.Types.ObjectId ,
+     required: true,
+     ref: 'peoples'              
      },    
      totalpay:{
      type: Number ,

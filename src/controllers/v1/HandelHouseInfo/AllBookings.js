@@ -6,9 +6,9 @@ const AllBookings = async (req,res,next)=>{
   const page = req.query.page || 1;
   const limit = req.query.limit || 8  ; 
   const query = {};
-
-  const totalData = await Bookings.countDocuments();
-  const result = await  Bookings.find().sort({PickUpDate : -1}).skip((page-1) * limit).limit(limit).populate('HouseData').populate({path:"Renter",select:"displayName photoURL _id"});
+  const owner = req.CurrentUser._id
+  const totalData = await Bookings.countDocuments({owner:owner});
+  const result = await  Bookings.find({owner:owner}).sort({PickUpDate : -1}).skip((page-1) * limit).limit(limit).populate('HouseData').populate({path:"Renter",select:"username avatar _id"});
   res.json({totalData:totalData , Houses : result});
  }
  catch(err){  

@@ -6,18 +6,21 @@ const Peoples = require('../../models/PeopleModel');
 const paymentHistory = require('../../models/PaymnetHistoryModel');
 const bookings = require('../../models/BookingModel');
 const Houses = require('../../models/HouseModel');
+const { default: mongoose } = require('mongoose');
 
 
 statistics.get("/", VerifyUser, VerifyAdmin, async (req, res, next) => {
   try {
-
-    const totaluser = await Peoples.countDocuments({
-      role: 'user'
-    })
-
-    const totalRevenueResult = await paymentHistory.aggregate([{
+  const owner = req.CurrentUser._id;
+  const totalRevenueResult = await paymentHistory.aggregate([
+    {
+      $match: {
+        owner: new mongoose.Types.ObjectId(owner) 
+      }
+    },
+    {
       $group: {
-        _id: null,
+        _id: '$owner', 
         totalRevenue: {
           $sum: '$totalpay'
         },
@@ -27,29 +30,28 @@ statistics.get("/", VerifyUser, VerifyAdmin, async (req, res, next) => {
 
     const totalRevenue = await totalRevenueResult.length > 0 ? totalRevenueResult[0].totalRevenue : 0;
 
-    const Pending = await bookings.countDocuments({
+    const Pending = await bookings.countDocuments({owner:owner,
       status: "Pending"
     })
-    const Cancelled = await bookings.countDocuments({
+    const Cancelled = await bookings.countDocuments({owner:owner,
       status: "Cancelled"
     })
-    const Confirmed = await bookings.countDocuments({
+    const Confirmed = await bookings.countDocuments({owner:owner,
       status: "Confirmed"
     })  
-    const Available = await Houses.countDocuments({
+    const Available = await Houses.countDocuments({owner:owner,
       availabilityStatus: "Available"
     })
-    const Booked = await Houses.countDocuments({
+    const Booked = await Houses.countDocuments({owner:owner,
       availabilityStatus: "Booked"
     })
-    const Maintenance = await Houses.countDocuments({
+    const Maintenance = await Houses.countDocuments({owner:owner,
       availabilityStatus: "Maintenance"
     })
 
     const Complited = await paymentHistory.countDocuments();
 
     const statics = {
-      totaluser,
       totalRevenue,
       totalBookings:
        {
@@ -70,6 +72,7 @@ statistics.get("/", VerifyUser, VerifyAdmin, async (req, res, next) => {
     res.send(statics)
 
   } catch (err) {
+    console.log(err)
     next(creteError(500, 'There is server side error'))
   }
 })

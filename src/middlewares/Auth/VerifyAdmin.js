@@ -5,7 +5,7 @@ const router = require('express').Router()
 
 const VerifyAdmin = async (req, res, next) => {
   try {
-    if (req.CurrentUser.role === 'admin') {
+    if (req.CurrentUser.role === 'House Owner') {
        next()
     } else {
       next(createError(401, 'Aunathorized Admin'))
